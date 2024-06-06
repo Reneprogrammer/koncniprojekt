@@ -1,0 +1,6 @@
+streamlit
+requests
+beautifulsoup4
+
+git commit -m "Add requirements.txt"
+git push
