@@ -1,38 +1,36 @@
 import streamlit as st
-from PIL import Image
-import pytesseract
+from geopy.geocoders import Nominatim
 import folium
 
-# Function to extract text from image
-def extract_text(image):
-    text = pytesseract.image_to_string(image)
-    return text
+# Create a function to geocode the location
+def geocode_location(location_text):
+    geolocator = Nominatim(user_agent="geoapiExercises")
+    location = geolocator.geocode(location_text)
+    return (location.latitude, location.longitude)
 
-# Function to display map with marker
-def show_map(location):
-    m = folium.Map(location=location, zoom_start=10)
-    folium.Marker(location=location, popup='Text Location').add_to(m)
-    return m
-
+# Create the Streamlit app
 def main():
-    st.title('Text Location Mapper')
+    st.title("Text Location Mapper")
 
-    uploaded_image = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
+    # Create a text input for the user to enter the location
+    location_text = st.text_input("Enter the location text:")
 
-    if uploaded_image is not None:
-        image = Image.open(uploaded_image)
-        st.image(image, caption='Uploaded Image', use_column_width=True)
-        text = extract_text(image)
-        st.write('Extracted Text:', text)
+    # Check if the user has entered a location
+    if location_text:
+        # Geocode the location
+        latitude, longitude = geocode_location(location_text)
 
-        if st.button('Map Text Location'):
-            # For demonstration purposes, using a hardcoded location (latitude, longitude)
-            # You can replace this with your logic to extract location from the text
-            location = (40.7128, -74.0060)  # Example location (New York City)
-            st.write('Location Coordinates:', location)
-            st.write('Mapping Location on Global Map...')
-            map_obj = show_map(location)
-            st.write(map_obj._repr_html_(), unsafe_allow_html=True)
+        # Create a map using Folium and pinpoint the location
+        my_map = folium.Map(location=[latitude, longitude], zoom_start=12)
+        folium.Marker([latitude, longitude], popup=location_text).add_to(my_map)
 
-if __name__ == '__main__':
+        # Display the map in the Streamlit app
+        st.write("Location:", location_text)
+        st.write("Latitude:", latitude)
+        st.write("Longitude:", longitude)
+        st.write("Map:")
+        st.write(my_map)
+
+# Run the Streamlit app
+if __name__ == "__main__":
     main()
