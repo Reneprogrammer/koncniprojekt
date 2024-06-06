@@ -1,25 +1,38 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
+from PIL import Image
+import pytesseract
+import folium
 
-def scrape_article(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        article_divs = soup.find_all('div', class_='css-1qiat4j')
-        content = ' '.join(div.text for div in article_divs)
-        return content
-    else:
-        return None
+# Function to extract text from image
+def extract_text(image):
+    text = pytesseract.image_to_string(image)
+    return text
 
-st.title("Article Scraper")
-url = st.text_input("Enter the article URL:")
-if url:
-    content = scrape_article(url)
-    if content:
-        st.write(content)
-    else:
-        st.write("Failed to retrieve the article")
+# Function to display map with marker
+def show_map(location):
+    m = folium.Map(location=location, zoom_start=10)
+    folium.Marker(location=location, popup='Text Location').add_to(m)
+    return m
+
+def main():
+    st.title('Text Location Mapper')
+
+    uploaded_image = st.file_uploader("Upload Image", type=["jpg", "jpeg", "png"])
+
+    if uploaded_image is not None:
+        image = Image.open(uploaded_image)
+        st.image(image, caption='Uploaded Image', use_column_width=True)
+        text = extract_text(image)
+        st.write('Extracted Text:', text)
+
+        if st.button('Map Text Location'):
+            # For demonstration purposes, using a hardcoded location (latitude, longitude)
+            # You can replace this with your logic to extract location from the text
+            location = (40.7128, -74.0060)  # Example location (New York City)
+            st.write('Location Coordinates:', location)
+            st.write('Mapping Location on Global Map...')
+            map_obj = show_map(location)
+            st.write(map_obj._repr_html_(), unsafe_allow_html=True)
+
+if __name__ == '__main__':
+    main()
