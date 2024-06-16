@@ -1,36 +1,62 @@
 import streamlit as st
-from geopy.geocoders import Nominatim
 import folium
+from streamlit_folium import folium_static
 
-# Create a function to geocode the location
-def geocode_location(location_text):
-    geolocator = Nominatim(user_agent="geoapiExercises")
-    location = geolocator.geocode(location_text)
-    return (location.latitude, location.longitude)
+# Page 1: Funnews Home Page
+def home_page():
+    st.title("Funnews")
+    st.markdown("## Global Issues, Gamified!")
+    st.image("path/to/your/global_map_image.jpg", use_column_width=True)
 
-# Create the Streamlit app
-def main():
-    st.title("Text Location Mapper")
+# Page 2: Interactive Global Map
+def interactive_map(option):
+    st.title("Interactive Global Map")
+    if option == "Peaceful Diplomat":
+        conflicts = {
+            "Ukraine": [48.3794, 31.1656],
+            "Gaza": [31.5, 34.47],
+            "South Sudan": [6.877, 31.307],
+            "Yemen": [15.5527, 48.5164]
+        }
+    elif option == "Green Activist":
+        conflicts = {
+            "Arctic": [66.33, -18.82],
+            "New York": [40.7128, -74.0060],
+            "Brazil Flood": [-14.2350, -51.9253]
+        }
+    elif option == "Welfare Economist":
+        conflicts = {
+            "Major Economic Event 1": [35.6895, 139.6917],
+            "Major Economic Event 2": [51.5074, -0.1278]
+        }
 
-    # Create a text input for the user to enter the location
-    location_text = st.text_input("Enter the location text:")
+    map_center = [20, 0]
+    folium_map = folium.Map(location=map_center, zoom_start=2)
 
-    # Check if the user has entered a location
-    if location_text:
-        # Geocode the location
-        latitude, longitude = geocode_location(location_text)
+    for location, coords in conflicts.items():
+        folium.Marker(coords, popup=location, icon=folium.Icon(color="red")).add_to(folium_map)
 
-        # Create a map using Folium and pinpoint the location
-        my_map = folium.Map(location=[latitude, longitude], zoom_start=12)
-        folium.Marker([latitude, longitude], popup=location_text).add_to(my_map)
+    folium_static(folium_map)
 
-        # Display the map in the Streamlit app
-        st.write("Location:", location_text)
-        st.write("Latitude:", latitude)
-        st.write("Longitude:", longitude)
-        st.write("Map:")
-        st.write(my_map)
+# Page 3: Detailed View
+def detailed_view(location):
+    st.title(f"Details about {location}")
+    # Add animation logic here (simplified example)
+    if location == "Gaza":
+        st.image("path/to/animated_explosion.gif", use_column_width=True)
+        st.markdown("### Current Events in Gaza")
+        st.write("Details and news articles about the current situation in Gaza...")
 
-# Run the Streamlit app
-if __name__ == "__main__":
-    main()
+# Sidebar Navigation
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Home", "Interactive Map", "Details"])
+
+if page == "Home":
+    home_page()
+elif page == "Interactive Map":
+    option = st.sidebar.selectbox("Choose your role:", ["Peaceful Diplomat", "Green Activist", "Welfare Economist"])
+    interactive_map(option)
+elif page == "Details":
+    location = st.sidebar.selectbox("Choose a location:", ["Gaza", "Ukraine", "South Sudan", "Yemen"])
+    detailed_view(location)
+
