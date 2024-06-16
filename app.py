@@ -1,12 +1,18 @@
 import streamlit as st
 import folium
 from streamlit_folium import folium_static
+import os
 
 # Page 1: Funnews Home Page
 def home_page():
     st.title("Funnews")
     st.markdown("## Global Issues, Gamified!")
-    st.image("path/to/your/global_map_image.jpg", use_column_width=True)
+    
+    image_path = "images/global_map_image.jpg"
+    if os.path.exists(image_path):
+        st.image(image_path, use_column_width=True)
+    else:
+        st.error(f"Image not found at path: {image_path}")
 
 # Page 2: Interactive Global Map
 def interactive_map(option):
@@ -43,7 +49,11 @@ def detailed_view(location):
     st.title(f"Details about {location}")
     # Add animation logic here (simplified example)
     if location == "Gaza":
-        st.image("path/to/animated_explosion.gif", use_column_width=True)
+        image_path = "images/animated_explosion.gif"
+        if os.path.exists(image_path):
+            st.image(image_path, use_column_width=True)
+        else:
+            st.error(f"Image not found at path: {image_path}")
         st.markdown("### Current Events in Gaza")
         st.write("Details and news articles about the current situation in Gaza...")
 
