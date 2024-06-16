@@ -8,7 +8,7 @@ def home_page():
     st.title("Funnews")
     st.markdown("## Global Issues, Gamified!")
     
-    image_path = "images/global_map_image.jpg"
+    image_path = "global_map_image.jpg"
     if os.path.exists(image_path):
         st.image(image_path, use_column_width=True)
     else:
